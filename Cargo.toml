@@ -1,0 +1,23 @@
+[package]
+name = "netreoxide"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = "0.6.20"
+dotenvy = "0.15.7"
+dotenvy_macro = "0.15.7"
+tokio = { version = "1.33.0", features = ["full"] }
+serde_json = "1.0.107"
+hcl-rs = "0.16.6"
+log = "0.4.20"
+git2 = "0.18.1"
+reqwest = { version = "0.11.22", features = ["json"] }
+serde = { version = "1.0.190", features = ["derive"] }
+rusoto_core = "0.48.0"
+rusoto_ec2 = "0.48.0"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
+askama = { version = "0.12.1", features = ["with-axum"] }
