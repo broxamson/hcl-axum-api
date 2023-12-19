@@ -976,6 +976,7 @@ dependencies = [
  "dotenvy_macro",
  "git2",
  "hcl-rs",
+ "http",
  "log",
  "reqwest",
  "rusoto_core",

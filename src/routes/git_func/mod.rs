@@ -79,6 +79,27 @@ pub async fn checkout_branch(repo_path: &Path, branch_name: &str) -> Result<(), 
     Ok(())
 }
 
+pub async fn checkout_directory(repo_path: &Path, branch_name: &str, directory_path: &Path) -> Result<(), git2::Error> {
+    // Open the existing Git repository
+    let repo = Repository::open(repo_path)?;
+
+    // Checkout the new branch
+    let branch = repo.find_branch(branch_name, BranchType::Local)?;
+    let target_commit = branch.into_reference().peel_to_commit()?;
+    let target_object: &Object = target_commit.as_object();
+
+    // Set the HEAD to the new branch
+    repo.set_head(&format!("refs/heads/{}", branch_name))?;
+
+    // Perform a partial checkout of the specified directory
+    let mut checkout_builder = CheckoutBuilder::new();
+    checkout_builder.path(directory_path);
+    repo.checkout_tree(target_object, Some(&mut checkout_builder))?;
+
+    Ok(())
+}
+
+
 pub async fn commit_changes(
     repo_path: &Path,
     author_name: &str,

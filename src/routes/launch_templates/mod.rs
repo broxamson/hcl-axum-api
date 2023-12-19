@@ -2,17 +2,15 @@ mod new_template;
 
 
 
-use crate::routes::git_func::{
-    checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request,
-    git_add_file, push_to_repository, PullRequest,
-};
+use crate::routes::git_func::{ clone_repo, commit_changes, create_new_branch, create_pull_request, git_add_file, push_to_repository, PullRequest, checkout_directory};
 
 use axum::extract::Query;
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use crate::routes::launch_templates::new_template::new_template;
 
-const REPO_URL: String = "https://bitbucket/netreo/terraform";
+const REPO_URL: String = "https://bitbucket/netreo/terraform".to_string();
 
 #[derive(Serialize, Deserialize)]
 pub struct QueryParams {
@@ -60,7 +58,7 @@ pub async fn bucket_api(
 
 // CHECKS OUT SAID BRANCH
 
-    if let Err(e) = checkout_branch(local_path, &branch_name).await {
+    if let Err(e) = checkout_directory(local_path, &branch_name, local_path).await {
         eprintln!("Error Checking out Branch: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
@@ -69,7 +67,7 @@ pub async fn bucket_api(
 
 // CREATES THE .TF FILE
 
-    if let Err(e) = new_template().await {
+    if let Err(e) = new_template().await.unwrap() {
         eprintln!("Error Creating Launch Template TF: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
