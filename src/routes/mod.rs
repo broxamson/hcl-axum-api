@@ -1,6 +1,7 @@
 mod ec2;
 mod git_func;
 mod s3;
+mod launch_templates;
 
 use crate::routes::ec2::launch_ec2;
 use crate::routes::s3::bucket_api;
