@@ -12,6 +12,8 @@ use axum::Json;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
+const REPO_URL: String = "https://bitbucket/netreo/terraform";
+
 #[derive(Serialize, Deserialize)]
 pub struct QueryParams {
     bucket_name: String,
@@ -33,10 +35,12 @@ pub async fn bucket_api(
 
     let url_base = pull_request.base_url.to_string();
     // The URL of the Git repository you want to clone
-    let repo_url = format!("https://{}/netreo/terraform", url_base);
+    let repo_url = REPO_URL;
 
     let branch_dir = format!("tf/{}", branch_name);
     let local_path = Path::new(&branch_dir);
+
+// CLONES THE REPO
 
     if let Err(e) = clone_repo(&repo_url, local_path).await {
         eprintln!("Error cloning repository: {}", e);
@@ -44,11 +48,17 @@ pub async fn bucket_api(
     }
     println!("Repository cloned successfully to {:?}", local_path);
 
+
+// CREATES NEW BRANCH
+
     if let Err(e) = create_new_branch(local_path, &branch_name).await {
         eprintln!("Error branching repository: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
     println!("Branch {} Created.", branch_name);
+
+
+// CHECKS OUT SAID BRANCH
 
     if let Err(e) = checkout_branch(local_path, &branch_name).await {
         eprintln!("Error Checking out Branch: {}", e);
@@ -56,13 +66,19 @@ pub async fn bucket_api(
     }
     println!("Branch {} Checked Out.", branch_name);
 
+
+// CREATES THE .TF FILE
+
     if let Err(e) = new_template().await {
         eprintln!("Error Creating Launch Template TF: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
     println!("Branch {} Checked Out.", branch_name);
 
-    let file_name = format!("modules/dev_s3/{}.tf", branch_name);
+
+// WRITES THE TF FILE
+
+    let file_name = format!("modules/dev_lt/{}.tf", branch_name);
 
     if let Err(e) = git_add_file(local_path, &file_name).await {
         eprintln!("Error adding file to the staging area: {}", e);
@@ -70,13 +86,18 @@ pub async fn bucket_api(
     }
     println!("File added to the staging area.");
 
-    if let Err(e) =
+
+// COMMITS TO GIT
+
+        if let Err(e) =
         commit_changes(local_path, &branch_name, "nicholas", "nvanamen@netreo.com").await
     {
         eprintln!("Error committing and pushing changes: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
     println!("Changes committed and pushed successfully.");
+
+    // PUSH TO GIT
 
     if let Err(e) = push_to_repository(local_path, &branch_name).await {
         eprintln!("Error pushing to the remote repository: {}", e);
@@ -86,6 +107,8 @@ pub async fn bucket_api(
         "Branch '{}' pushed successfully to the remote repository.",
         &branch_name
     );
+
+    // CREATE PR
 
     if let Err(err) = create_pull_request(pull_request).await {
         eprintln!("Error: {:?}", err);
