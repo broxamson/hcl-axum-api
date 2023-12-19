@@ -56,7 +56,11 @@ pub async fn bucket_api(
     }
     println!("Branch {} Checked Out.", branch_name);
 
-
+    if let Err(e) = new_template().await {
+        eprintln!("Error Creating Launch Template TF: {}", e);
+        return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+    }
+    println!("Branch {} Checked Out.", branch_name);
 
     let file_name = format!("modules/dev_s3/{}.tf", branch_name);
 
