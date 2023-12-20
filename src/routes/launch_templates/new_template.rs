@@ -1,11 +1,14 @@
-use std::collections::HashMap;
+#![recursion_limit = "256"]
+
 use std::fs::File;
 use std::io::Write;
+use anyhow::{Result, Error};
 use axum::Json;
-use hcl::{Block, Body};
+use hcl::{Block, Body, body};
+use serde::{Deserialize, Serialize};
 
 
-
+#[derive(Serialize, Deserialize)]
 pub struct LaunchTemplate {
     aws_launch_template: String,
     default_version: u8,
@@ -17,16 +20,20 @@ pub struct LaunchTemplate {
     iam_instance_profile_arn: String,
     security_groups: Vec<String>,
     subnet_id: String,
-    device_tags: Json<String>,
+    device_tags: String,
 
 }
 
 
 
 
-pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Err()> {
+pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Error> {
     let security_groups = launch_template.security_groups.iter().to_owned().collect();
+    let bawdy = body!({
+        resource "aws_lb" launch_template.aws_launch_template.to_owned() {
 
+        }
+    });
     let body = Body::builder()
         .add_block(
             Block::builder("resource")
@@ -47,7 +54,6 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Err()> 
                 )
                 .add_block(
                     Block::builder("network_interfaces")
-
                         .add_attribute(("security_groups", security_groups))
                         .add_attribute(("subnet_id", launch_template.subnet_id))
                         .build(),
@@ -55,14 +61,18 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Err()> 
                 .add_block(
                     Block::builder("tag_specifications")
                         .add_attribute(("resource_type", "instance"))
-                        .add_attribute(("tags", launch_template.device_tags))
+                        .add_attribute(("tags", launch_template.device_tags.to_string()))
                         .build(),
                 )
                 .add_block(
                     Block::builder("lifecycle")
-                        .add_attribute(("ignore_changes", ["default_version"].to_string()))
+                        .add_attribute(("ignore_changes", "[\"default_version\"]".to_string()))
                         .build(),
-                ).build());
+                )
+                .build()
+        );
+
+
 
 
 
@@ -76,11 +86,7 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Err()> 
     file.write_all(serialized.as_bytes())
         .expect("Failed to write to the file");
 
-
-
     println!("HCL code has been written to {:?}.", &file);
-
-
 
     Ok(())
 

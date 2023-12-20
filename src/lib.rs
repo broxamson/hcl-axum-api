@@ -1,6 +1,7 @@
-use crate::routes::create_routes;
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use crate::routes::create_routes;
 
 mod jenkins;
 mod routes;

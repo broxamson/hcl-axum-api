@@ -1,7 +1,8 @@
-use hcl::{Block, Body};
 use std::fs::{File, OpenOptions};
 use std::io;
 use std::io::{Read, Seek, Write};
+
+use hcl::{Block, Body};
 
 pub fn new_bucket(bucket_name: &str) {
     let bucketname = bucket_name;

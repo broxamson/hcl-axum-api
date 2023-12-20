@@ -1,11 +1,13 @@
-use serde::{Deserialize, Serialize};
-mod lib;
-use crate::routes::ec2::lib::launch_instance_from_template;
-use axum::extract::Query;
-use axum::Json;
-
 extern crate rusoto_core;
 extern crate rusoto_ec2;
+
+use axum::extract::Query;
+use axum::Json;
+use serde::{Deserialize, Serialize};
+
+use crate::routes::ec2::lib::launch_instance_from_template;
+
+mod lib;
 
 #[derive(Serialize, Deserialize)]
 pub struct LaunchTemplateParams {

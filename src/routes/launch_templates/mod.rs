@@ -1,26 +1,26 @@
-mod new_template;
-
-
-
-use crate::routes::git_func::{ clone_repo, commit_changes, create_new_branch, create_pull_request, git_add_file, push_to_repository, PullRequest, checkout_directory};
-
+use std::path::Path;
+use anyhow::{Result, Error};
 use axum::extract::Query;
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+
+use crate::routes::git_func::{checkout_directory, clone_repo, commit_changes, create_new_branch, create_pull_request, git_add_file, PullRequest, push_to_repository};
 use crate::routes::launch_templates::new_template::new_template;
+
+mod new_template;
+
 
 const REPO_URL: String = "https://bitbucket/netreo/terraform".to_string();
 
 #[derive(Serialize, Deserialize)]
 pub struct QueryParams {
-    bucket_name: String,
+    lt_name: String,
 }
 
-pub async fn bucket_api(
-    Query(bucket_name): Query<QueryParams>,
+pub async fn lt_api(
+    Query(lt_name): Query<QueryParams>,
 ) -> Result<Json<String>, axum::http::StatusCode> {
-    let branch_name = bucket_name.bucket_name.to_string(); // Replace with your branch name
+    let branch_name = lt_name.lt_name.to_string(); // Replace with your branch name
     let pull_request = PullRequest {
         title: branch_name.to_string(),
         description: format!("Creating new Bucket: {}", branch_name).to_string(),

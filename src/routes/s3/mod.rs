@@ -1,14 +1,16 @@
-mod new_bucket;
+use std::path::Path;
 
-use crate::routes::git_func::{
-    checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request,
-    git_add_file, push_to_repository, PullRequest,
-};
-use crate::routes::s3::new_bucket::new_bucket;
 use axum::extract::Query;
 use axum::Json;
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+
+use crate::routes::git_func::{
+    checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request,
+    git_add_file, PullRequest, push_to_repository,
+};
+use crate::routes::s3::new_bucket::new_bucket;
+
+mod new_bucket;
 
 #[derive(Serialize, Deserialize)]
 pub struct QueryParams {

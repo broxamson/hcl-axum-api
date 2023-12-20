@@ -1,21 +1,16 @@
 extern crate git2;
 
+use std::path::Path;
+
 use dotenvy_macro::dotenv;
-use git2::build::{CheckoutBuilder, RepoBuilder};
 use git2::{
     BranchType, Cred, Error, FetchOptions, Object, PushOptions, RemoteCallbacks, Repository,
     Signature,
 };
+use git2::build::{CheckoutBuilder, RepoBuilder};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::path::Path;
-
-
-
-
-
-
 
 pub async fn clone_repo(repo_url: &str, local_path: &Path) -> Result<(), Error> {
     let mut callbacks = RemoteCallbacks::new();
