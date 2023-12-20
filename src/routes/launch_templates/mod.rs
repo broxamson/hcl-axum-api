@@ -61,7 +61,7 @@ pub async fn lt_api(
         repository_slug: "terraform".to_string(),
     };
 
-    let url_base = pull_request.base_url.to_string();
+   // let url_base = pull_request.base_url.to_string();
     // The URL of the Git repository you want to clone
     let repo_url = REPO_URL;
 
