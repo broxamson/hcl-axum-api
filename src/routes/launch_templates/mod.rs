@@ -1,5 +1,6 @@
 use std::path::Path;
-use anyhow::{Result, Error};
+
+use anyhow::Result;
 use axum::extract::Query;
 use axum::Json;
 use serde::{Deserialize, Serialize};
@@ -9,18 +10,47 @@ use crate::routes::launch_templates::new_template::new_template;
 
 mod new_template;
 
-
-const REPO_URL: String = "https://bitbucket/netreo/terraform".to_string();
+const REPO_URL: &str = "https://bitbucket/netreo/terraform";
 
 #[derive(Serialize, Deserialize)]
-pub struct QueryParams {
-    lt_name: String,
+pub struct LaunchTemplate {
+    aws_launch_template: String,
+    default_version: u8,
+    disable_api_termination: bool,
+    image_id: String,
+    instance_type: String,
+    key_name: String,
+    name: String,
+    iam_instance_profile_arn: String,
+    security_groups: Vec<String>,
+    subnet_id: String,
+    device_tags: String,
+
 }
 
+
+
 pub async fn lt_api(
-    Query(lt_name): Query<QueryParams>,
+    Query(launch_template): Query<LaunchTemplate>,
 ) -> Result<Json<String>, axum::http::StatusCode> {
-    let branch_name = lt_name.lt_name.to_string(); // Replace with your branch name
+
+    let launch_template_json = LaunchTemplate {
+        aws_launch_template: launch_template.aws_launch_template.to_string(),
+        default_version: launch_template.default_version,
+        disable_api_termination: launch_template.disable_api_termination,
+        image_id: launch_template.image_id.to_string(),
+        instance_type: launch_template.instance_type.to_string(),
+        key_name: launch_template.key_name.to_string(),
+        name: launch_template.name.to_string(),
+        iam_instance_profile_arn: launch_template.iam_instance_profile_arn.to_string(),
+        security_groups: launch_template.security_groups,
+        subnet_id: launch_template.subnet_id.to_string(),
+        device_tags: launch_template.device_tags.to_string(),
+    };
+
+
+
+    let branch_name = launch_template.name.to_string();
     let pull_request = PullRequest {
         title: branch_name.to_string(),
         description: format!("Creating new Bucket: {}", branch_name).to_string(),
@@ -67,9 +97,8 @@ pub async fn lt_api(
 
 // CREATES THE .TF FILE
 
-    if let Err(e) = new_template().await.unwrap() {
-        eprintln!("Error Creating Launch Template TF: {}", e);
-        return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
+    if let Err(err) = new_template(launch_template_json).await {
+        eprintln!("Error: {:?}", err);
     }
     println!("Branch {} Checked Out.", branch_name);
 
