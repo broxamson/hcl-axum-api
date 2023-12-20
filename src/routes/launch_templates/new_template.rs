@@ -47,16 +47,7 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Err()> 
                 )
                 .add_block(
                     Block::builder("network_interfaces")
-                        .add_attribute(("device_index", 0))
-                        .add_attribute(("ipv4_address_count", 0))
-                        .add_attribute(("ipv4_addresses", []))
-                        .add_attribute(("ipv4_prefix_count", 0))
-                        .add_attribute(("ipv4_prefixes", []))
-                        .add_attribute(("ipv6_address_count", 0))
-                        .add_attribute(("ipv6_addresses", []))
-                        .add_attribute(("ipv6_prefix_count", 0))
-                        .add_attribute(("ipv6_prefixes", []))
-                        .add_attribute(("network_card_index", 0))
+
                         .add_attribute(("security_groups", security_groups))
                         .add_attribute(("subnet_id", launch_template.subnet_id))
                         .build(),
@@ -69,7 +60,7 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Err()> 
                 )
                 .add_block(
                     Block::builder("lifecycle")
-                        .add_attribute(("ignore_changes", ["default_version"]))
+                        .add_attribute(("ignore_changes", ["default_version"].to_string()))
                         .build(),
                 ).build());
 
