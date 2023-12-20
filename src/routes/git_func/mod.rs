@@ -181,6 +181,7 @@ pub async fn push_to_repository(repo_path: &Path, branch_name: &str) -> Result<(
         Err(e) => Err(format!("Failed to push branch '{}': {}", branch_name, e)),
     }
 }
+
 pub async fn git_add_file(repo_path: &Path, file_path: &str) -> Result<(), git2::Error> {
     // Open the Git repository
     let repo = Repository::open(repo_path)?;

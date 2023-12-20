@@ -9,7 +9,7 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Error> 
     let json_str = serde_json::to_string(&launch_template)?;
 
     // Deserialize JSON string to HCL Body
-   let hcl_body = hcl::to_string(&json_str)?;
+    let hcl_body = hcl::to_string(&json_str)?;
 
     // Use the deserialized HCL Body as needed
     dbg!(&hcl_body);
@@ -20,7 +20,6 @@ pub async fn new_template(launch_template: LaunchTemplate) -> Result<(), Error> 
 
     // Write the generated HCL to the file
     file.write_all(hcl_body.as_bytes()).expect("Failed to write to the file");
-
 
 
     Ok(())

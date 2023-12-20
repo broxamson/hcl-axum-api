@@ -29,11 +29,9 @@ pub struct LaunchTemplate {
 }
 
 
-
 pub async fn lt_api(
     Query(launch_template): Query<LaunchTemplate>,
 ) -> Result<Json<String>, axum::http::StatusCode> {
-
     let launch_template_json = LaunchTemplate {
         aws_launch_template: launch_template.aws_launch_template.to_string(),
         default_version: launch_template.default_version,
@@ -49,7 +47,6 @@ pub async fn lt_api(
     };
 
 
-
     let branch_name = launch_template.name.to_string();
     let pull_request = PullRequest {
         title: branch_name.to_string(),
@@ -61,7 +58,7 @@ pub async fn lt_api(
         repository_slug: "terraform".to_string(),
     };
 
-   // let url_base = pull_request.base_url.to_string();
+    // let url_base = pull_request.base_url.to_string();
     // The URL of the Git repository you want to clone
     let repo_url = REPO_URL;
 
@@ -116,7 +113,7 @@ pub async fn lt_api(
 
 // COMMITS TO GIT
 
-        if let Err(e) =
+    if let Err(e) =
         commit_changes(local_path, &branch_name, "nicholas", "nvanamen@netreo.com").await
     {
         eprintln!("Error committing and pushing changes: {}", e);
