@@ -12,12 +12,9 @@ mod new_lb;
 
 const REPO_URL: &str = "https://bitbucket/netreo/terraform";
 
-#[derive(Serialize, Deserialize)]
-#[derive(Serialize, Deserialize)]
-
 
 #[derive(Serialize, Deserialize)]
-struct LoadBalancer {
+pub struct LoadBalancer {
     r#type: String,
     name: String,
     subnets: Vec<String>,
@@ -27,13 +24,13 @@ struct LoadBalancer {
 }
 
 #[derive(Serialize, Deserialize)]
-struct LoadBalancerAttribute {
+pub struct LoadBalancerAttribute {
     key: String,
     value: String,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Listener {
+pub struct Listener {
     r#type: String,
     default_actions: Vec<DefaultAction>,
     load_balancer_arn: LoadBalancerArn,
@@ -42,40 +39,36 @@ struct Listener {
 }
 
 #[derive(Serialize, Deserialize)]
-struct DefaultAction {
+pub struct DefaultAction {
     r#type: String,
     fixed_response_config: FixedResponseConfig,
 }
 
 #[derive(Serialize, Deserialize)]
-struct FixedResponseConfig {
+pub struct FixedResponseConfig {
     content_type: String,
     status_code: String,
     content_body: String,
 }
 
 #[derive(Serialize, Deserialize)]
-struct LoadBalancerArn {
+pub struct LoadBalancerArn {
     r#ref: String,
 }
 
-
-struct LoadBalancerQuery {
+#[derive(Serialize, Deserialize)]
+pub struct LoadBalancerQuery {
     load_balancer: LoadBalancer,
     load_balancer_attr: LoadBalancerAttribute,
     listener: Listener,
     default_action: DefaultAction,
     fixed_response: FixedResponseConfig,
-    load_balancer_arn: LoadBalancerArn
+    load_balancer_arn: LoadBalancerArn,
 }
 
 pub async fn lb_api(
     Query(load_balancer_param): Query<LoadBalancerQuery>,
-
-
 ) -> Result<Json<String>, axum::http::StatusCode> {
-
-
     let branch_name = load_balancer_param.load_balancer.name.to_string();
     let pull_request = PullRequest {
         title: branch_name.to_string(),
@@ -123,7 +116,7 @@ pub async fn lb_api(
 
 // CREATES THE .TF FILE
 
-    if let Err(err) = new_load_balancer(load_balancer_param ).await {
+    if let Err(err) = new_load_balancer(load_balancer_param).await {
         eprintln!("Error: {:?}", err);
     }
     println!("Branch {} Checked Out.", branch_name);

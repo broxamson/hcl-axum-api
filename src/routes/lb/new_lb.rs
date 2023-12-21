@@ -3,18 +3,15 @@ use std::io::Write;
 
 use anyhow::{Error, Result};
 
-
 use crate::routes::lb::{DefaultAction, FixedResponseConfig, Listener, LoadBalancer, LoadBalancerArn, LoadBalancerAttribute, LoadBalancerQuery};
 
 pub async fn new_load_balancer(load_balancer_param: LoadBalancerQuery) -> Result<(), Error> {
-
     let load_balancer = LoadBalancer {
-
         r#type: load_balancer_param.load_balancer.r#type.to_string(),
         name: load_balancer_param.load_balancer.name.to_string(),
-        subnets: vec![load_balancer_param.load_balancer.subnets.to_string()],
-        security_groups: vec![load_balancer_param.load_balancer.security_groups.to_string()],
-        scheme: load_balancer_param.load_balancerto_string(),
+        subnets: load_balancer_param.load_balancer.subnets,
+        security_groups: load_balancer_param.load_balancer.security_groups,
+        scheme: load_balancer_param.load_balancer.scheme,
         load_balancer_attributes: vec![LoadBalancerAttribute {
             key: load_balancer_param.load_balancer_attr.key.to_string(),
             value: load_balancer_param.load_balancer_attr.value.to_string(),
@@ -26,9 +23,9 @@ pub async fn new_load_balancer(load_balancer_param: LoadBalancerQuery) -> Result
         default_actions: vec![DefaultAction {
             r#type: load_balancer_param.default_action.r#type,
             fixed_response_config: FixedResponseConfig {
-                content_type: "text/plain".to_string(),
-                status_code: "200".to_string(),
-                content_body: "OK".to_string(),
+                content_type: load_balancer_param.fixed_response.content_type.to_string(),
+                status_code: load_balancer_param.fixed_response.status_code,
+                content_body: load_balancer_param.fixed_response.content_body,
             },
         }],
         load_balancer_arn: LoadBalancerArn { r#ref: load_balancer_param.load_balancer_arn.r#ref.to_string() },
@@ -38,7 +35,7 @@ pub async fn new_load_balancer(load_balancer_param: LoadBalancerQuery) -> Result
 
 
     let json_lb = serde_json::to_string(&load_balancer)?;
-    let json_list =serde_json::to_string(&lb_listener)?;
+    let json_list = serde_json::to_string(&lb_listener)?;
 
     // Deserialize JSON string to HCL Body
     let hcl_lb = hcl::to_string(&json_lb)?;
