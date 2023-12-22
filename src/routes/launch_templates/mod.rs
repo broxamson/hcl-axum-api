@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 use axum::extract::Query;
 use axum::Json;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::routes::git_func::{checkout_directory, clone_repo, commit_changes, create_new_branch, create_pull_request, git_add_file, PullRequest, push_to_repository};
@@ -10,7 +11,7 @@ use crate::routes::launch_templates::new_template::new_template;
 
 mod new_template;
 
-const REPO_URL: &str = "https://bitbucket/netreo/terraform";
+const REPO_URL: &str = "https://bitbucket.org/netreo/terraform";
 
 #[derive(Serialize, Deserialize)]
 pub struct LaunchTemplate {
@@ -30,7 +31,7 @@ pub struct LaunchTemplate {
 
 
 pub async fn lt_api(
-    Query(launch_template): Query<LaunchTemplate>,
+    Json(launch_template): Json<LaunchTemplate>,
 ) -> Result<Json<String>, axum::http::StatusCode> {
     let launch_template_json = LaunchTemplate {
         aws_launch_template: launch_template.aws_launch_template.to_string(),
@@ -47,7 +48,7 @@ pub async fn lt_api(
     };
 
 
-    let branch_name = launch_template.name.to_string();
+    let branch_name = launch_template.aws_launch_template.to_string();
     let pull_request = PullRequest {
         title: branch_name.to_string(),
         description: format!("Creating new Bucket: {}", branch_name).to_string(),
@@ -66,7 +67,7 @@ pub async fn lt_api(
     let local_path = Path::new(&branch_dir);
 
 // CLONES THE REPO
-
+    println!("{} {:?}", repo_url, local_path);
     if let Err(e) = clone_repo(&repo_url, local_path).await {
         eprintln!("Error cloning repository: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
