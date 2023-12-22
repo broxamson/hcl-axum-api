@@ -1,9 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
-use axum::extract::Query;
 use axum::Json;
-use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::routes::git_func::{checkout_directory, clone_repo, commit_changes, create_new_branch, create_pull_request, git_add_file, PullRequest, push_to_repository};
