@@ -20,6 +20,7 @@ rusoto_core = "0.48.0"
 rusoto_ec2 = "0.48.0"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
-askama = { version = "0.12.1", features = ["with-axum"] }
+
 anyhow = "1.0.75"
+yew = {version = "0.21.0",  features = ["csr"] }
 

@@ -5,6 +5,7 @@ use crate::routes::create_routes;
 
 mod jenkins;
 mod routes;
+mod git_func;
 
 pub async fn web() {
     tracing_subscriber::registry()

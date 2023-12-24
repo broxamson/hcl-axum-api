@@ -6,7 +6,6 @@ use crate::routes::load_balancer::lb_api;
 use crate::routes::s3::bucket_api;
 
 mod ec2;
-mod git_func;
 mod s3;
 mod launch_templates;
 mod load_balancer;

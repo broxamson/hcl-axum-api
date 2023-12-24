@@ -6,7 +6,7 @@ use dotenvy_macro::dotenv;
 use serde::{Deserialize, Serialize};
 
 use crate::jenkins::trigger_tf_check;
-use crate::routes::git_func::{checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request, delete_comitted_change, git_add_file, PullRequest, push_to_repository};
+use crate::git_func::{checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request, delete_comitted_change, git_add_file, PullRequest, push_to_repository};
 use crate::routes::launch_templates::new_template::new_launch_template;
 
 mod new_template;

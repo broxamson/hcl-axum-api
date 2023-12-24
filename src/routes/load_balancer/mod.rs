@@ -5,7 +5,7 @@ use axum::Json;
 use dotenvy_macro::dotenv;
 use serde::{Deserialize, Serialize};
 
-use crate::routes::git_func::{checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request, delete_comitted_change, git_add_file, PullRequest, push_to_repository};
+use crate::git_func::{checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request, delete_comitted_change, git_add_file, PullRequest, push_to_repository};
 use crate::routes::load_balancer::new_lb::new_load_balancer;
 
 mod new_lb;
