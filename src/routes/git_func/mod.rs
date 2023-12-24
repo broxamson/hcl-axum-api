@@ -1,5 +1,6 @@
 extern crate git2;
 
+
 use std::path::Path;
 
 use dotenvy_macro::dotenv;
@@ -11,6 +12,7 @@ use git2::build::{CheckoutBuilder, RepoBuilder};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use tokio::fs::remove_dir_all;
 
 pub async fn clone_repo(repo_url: &str, local_path: &Path) -> Result<(), Error> {
     let mut callbacks = RemoteCallbacks::new();
@@ -74,25 +76,6 @@ pub async fn checkout_branch(repo_path: &Path, branch_name: &str) -> Result<(), 
     Ok(())
 }
 
-pub async fn checkout_directory(repo_path: &Path, branch_name: &str, directory_path: &Path) -> Result<(), git2::Error> {
-    // Open the existing Git repository
-    let repo = Repository::open(repo_path)?;
-
-    // Checkout the new branch
-    let branch = repo.find_branch(branch_name, BranchType::Local)?;
-    let target_commit = branch.into_reference().peel_to_commit()?;
-    let target_object: &Object = target_commit.as_object();
-
-    // Set the HEAD to the new branch
-    repo.set_head(&format!("refs/heads/{}", branch_name))?;
-
-    // Perform a partial checkout of the specified directory
-    let mut checkout_builder = CheckoutBuilder::new();
-    checkout_builder.path(directory_path);
-    repo.checkout_tree(target_object, Some(&mut checkout_builder))?;
-
-    Ok(())
-}
 
 
 pub async fn commit_changes(
@@ -107,10 +90,7 @@ pub async fn commit_changes(
     // Get the index (staging area) to stage changes
     let mut index = repo.index()?;
 
-    // Stage changes you want to commit (e.g., modifying files)
-    // For example, you can use repo.index.add_path("file.txt") to stage a file.
-    // Make sure to add all the changes you want to include in the commit.
-
+    // Stage changes you want to commit
     // Committer's identity
     let signature = Signature::now(author_name, author_email)?;
 
@@ -149,7 +129,7 @@ pub async fn commit_changes(
 
 pub async fn push_to_repository(repo_path: &Path, branch_name: &str) -> Result<(), String> {
     // Open the Git repository
-    let repo = match git2::Repository::open(repo_path) {
+    let repo = match Repository::open(repo_path) {
         Ok(repo) => repo,
         Err(e) => return Err(format!("Failed to open repository: {}", e)),
     };
@@ -256,5 +236,15 @@ pub(crate) async fn create_pull_request(pull_request: PullRequest) -> Result<(),
         );
     }
 
+    Ok(())
+}
+
+pub async fn delete_comitted_change(dir: String) -> Result<(),  Error> {
+    let file_path = Path::new(&dir);
+    println!("{}", file_path.display());
+    if file_path.exists() {
+        println!("Removing {:?}", file_path);
+        remove_dir_all(file_path).await.expect("error deleting dir");
+    }
     Ok(())
 }

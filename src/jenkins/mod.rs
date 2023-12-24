@@ -1,28 +1,33 @@
-use std::str::FromStr;
+use anyhow::Error;
+use dotenvy_macro::dotenv;
 
-pub async fn _trigger_tf_check(
+pub async fn trigger_tf_check(
     branch: &str,
-    tf_type: &str,
+    aws_type: &str,
     env: &str,
     region: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<String, Error> {
+    let auth_token = dotenv!("AUTH_TOKEN");
+    let auth_string = format!("Basic {}", auth_token);
     let client = reqwest::Client::builder().build()?;
-    let jenkins_host = "http://172.16.1.47:8080";
+    let jenkins_host = dotenv!("JENKINS_HOST");
+
     let auth_header_value = reqwest::header::HeaderValue::from_str(
-        "Basic bnZhbmFtZW46MTE5OGM1NWRkOTU2YTIxNjAxMmI3MDA1OTM2NTc4N2M2NA==",
+        &auth_string,
     )?;
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert(reqwest::header::AUTHORIZATION, auth_header_value);
+    headers.insert(reqwest::header::ACCEPT, reqwest::header::HeaderValue::from_static("application/json"));
 
     let json_data = serde_json::json!({
         "terraform_branch": branch,
         "terraform_command": "plan -no-color",
-        "terraform_service": tf_type,
+        "terraform_service": aws_type,
     });
 
     let request = client
         .post(format!(
-            "/job/{}/Terraform/job/{}/job/{}/job/TERRAFORM-PLAN-APPLY/buildWithParameters",
+            "{}/job//Terraform/job/{}/job/{}/job/TERRAFORM-PLAN-APPLY/buildWithParameters",
             jenkins_host, env, region
         ))
         .headers(headers)
@@ -35,14 +40,19 @@ pub async fn _trigger_tf_check(
         let body = response.text().await?;
         println!(
             "Jenkins job triggered successfully! Response body: {}",
-            body
+            &body
         );
+
+        // Return the response body as a String
+        Ok(body)
     } else {
+        let status_code = response.status();
         println!(
             "Failed to trigger Jenkins job. Status code: {}",
-            response.status()
+            status_code
         );
-    }
 
-    Ok(())
+        // Return an error with the status code
+        Err(anyhow::anyhow!("Failed to trigger Jenkins job. Status code: {}", status_code))
+    }
 }

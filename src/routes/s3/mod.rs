@@ -2,16 +2,14 @@ use std::path::Path;
 
 use axum::extract::Query;
 use axum::Json;
+use dotenvy_macro::dotenv;
 use serde::{Deserialize, Serialize};
 
-use crate::routes::git_func::{
-    checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request,
-    git_add_file, PullRequest, push_to_repository,
-};
+use crate::routes::git_func::{checkout_branch, clone_repo, commit_changes, create_new_branch, create_pull_request, git_add_file, PullRequest, push_to_repository};
 use crate::routes::s3::new_bucket::new_bucket;
 
 mod new_bucket;
-
+const REPO_PATH: &str = dotenv!("REPO_DIR");
 #[derive(Serialize, Deserialize)]
 pub struct QueryParams {
     bucket_name: String,
@@ -35,7 +33,7 @@ pub async fn bucket_api(
     // The URL of the Git repository you want to clone
     let repo_url = format!("https://{}/netreo/terraform", url_base);
 
-    let branch_dir = format!("tf/{}", branch_name);
+    let branch_dir = format!("{}/tf/{}", REPO_PATH, branch_name);
     let local_path = Path::new(&branch_dir);
 
     if let Err(e) = clone_repo(&repo_url, local_path).await {
@@ -73,15 +71,20 @@ pub async fn bucket_api(
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
     println!("Changes committed and pushed successfully.");
-
-    if let Err(e) = push_to_repository(local_path, &branch_name).await {
+    let branch_path= Path::new(&branch_dir);
+    if let Err(e) = push_to_repository(&branch_path, &branch_name).await {
         eprintln!("Error pushing to the remote repository: {}", e);
         return Err(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     }
+
     println!(
         "Branch '{}' pushed successfully to the remote repository.",
         &branch_name
-    );
+    )
+
+
+
+    ;
 
     if let Err(err) = create_pull_request(pull_request).await {
         eprintln!("Error: {:?}", err);
