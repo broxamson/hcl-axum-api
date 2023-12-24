@@ -19,4 +19,5 @@ pub async fn create_routes() -> Router {
         .route("/api/ec2/launch_instance", post(launch_ec2))
         .route("/api/ec2/create_lt", post(lt_api))
         .route("/api/ec2/create_lb", post(lb_api))
+
 }

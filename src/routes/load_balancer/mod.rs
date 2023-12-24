@@ -16,17 +16,19 @@ const REPO_PATH: &str = dotenv!("REPO_DIR");
 
 #[derive(Serialize, Deserialize)]
 pub struct LoadBalancer {
-    aws_load_balancer: String,
-    default_version: u8,
-    disable_api_termination: bool,
-    image_id: String,
-    instance_type: String,
-    key_name: String,
+
     name: String,
-    iam_instance_profile_arn: String,
+    internal: bool,
+    lb_type: String,
     security_groups: Vec<String>,
-    subnet_id: String,
-    device_tags: Vec<String>,
+    subnet_id: Vec<String>,
+    port: u8,
+    protocol: String,
+    target_type: String,
+    vpc_id: String,
+
+
+
 
 }
 
@@ -35,17 +37,18 @@ pub async fn lb_api(
     Json(load_balancer): Json<LoadBalancer>,
 ) -> Result<Json<String>, axum::http::StatusCode> {
     let load_balancer_json = LoadBalancer {
-        aws_load_balancer: load_balancer.aws_load_balancer.to_string(),
-        default_version: load_balancer.default_version,
-        disable_api_termination: load_balancer.disable_api_termination,
-        image_id: load_balancer.image_id.to_string(),
-        instance_type: load_balancer.instance_type.to_string(),
-        key_name: load_balancer.key_name.to_string(),
+
         name: load_balancer.name.to_string(),
-        iam_instance_profile_arn: load_balancer.iam_instance_profile_arn.to_string(),
+
+        internal: load_balancer.internal,
+        lb_type: load_balancer.lb_type.to_string(),
         security_groups: load_balancer.security_groups,
-        subnet_id: load_balancer.subnet_id.to_string(),
-        device_tags: load_balancer.device_tags,
+        subnet_id: load_balancer.subnet_id,
+
+        port: load_balancer.port,
+        protocol: load_balancer.protocol.to_string(),
+        target_type: load_balancer.target_type.to_string(),
+        vpc_id: load_balancer.vpc_id.to_string(),
     };
 
 
