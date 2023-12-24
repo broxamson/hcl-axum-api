@@ -22,3 +22,4 @@ tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
 askama = { version = "0.12.1", features = ["with-axum"] }
 anyhow = "1.0.75"
+
