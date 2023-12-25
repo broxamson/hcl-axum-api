@@ -12,7 +12,11 @@ pub async fn new_launch_template(template: LaunchTemplate, local_path: &Path) ->
     let name_tag = device_tags[0].to_string();
     let owner_tag = device_tags[1].to_string();
     let cicd_tag = device_tags[2].to_string();
-
+    let sg_format_list: Vec<String> = template
+        .security_groups
+        .iter()
+        .map(|security_group| format!("data.security_group.{}.id", security_group))
+        .collect();
     let body = Body::builder()
         .add_block(
             Block::builder("resource")
@@ -21,13 +25,13 @@ pub async fn new_launch_template(template: LaunchTemplate, local_path: &Path) ->
                 .add_attribute(("disable_api_termination", template.disable_api_termination))
                 .add_attribute(("image_id", template.image_id))
                 .add_attribute(("instance_type", template.instance_type))
-                .add_attribute(("key_name", template.key_name))
+                .add_attribute(("key_name",format!("data.awas.{}.key_name", template.key_name)))
                 .add_attribute(("name", template.name.clone()))
                 .add_attribute(("tags", ""))
                 .add_attribute(("tags_all", ""))
                 .add_block(
                     Block::builder("iam_instance_profile")
-                        .add_attribute(("arn", template.iam_instance_profile_arn))
+                        .add_attribute(("arn", format!("data.aws_aim_inatnce_profile.{}.arn",template.iam_instance_profile_arn)))
                         .build(),
                 )
                 .add_block(
@@ -42,7 +46,7 @@ pub async fn new_launch_template(template: LaunchTemplate, local_path: &Path) ->
                         .add_attribute(("ipv6_prefix_count", "0"))
                         .add_attribute(("ipv6_prefixes", "[]"))
                         .add_attribute(("network_card_index", "0"))
-                        .add_attribute(("security_groups", template.security_groups))
+                        .add_attribute(("security_groups", sg_format_list))
                         .add_attribute(("subnet_id", template.subnet_id))
                         .build(),
                 )
