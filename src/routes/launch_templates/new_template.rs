@@ -31,7 +31,7 @@ pub async fn new_launch_template(template: LaunchTemplate, local_path: &Path) ->
                 .add_attribute(("tags_all", ""))
                 .add_block(
                     Block::builder("iam_instance_profile")
-                        .add_attribute(("arn", format!("data.aws_aim_inatnce_profile.{}.arn",template.iam_instance_profile_arn)))
+                        .add_attribute(("arn", format!("data.aws_aim_instance_profile.{}.arn",template.iam_instance_profile_arn)))
                         .build(),
                 )
                 .add_block(
@@ -47,7 +47,7 @@ pub async fn new_launch_template(template: LaunchTemplate, local_path: &Path) ->
                         .add_attribute(("ipv6_prefixes", "[]"))
                         .add_attribute(("network_card_index", "0"))
                         .add_attribute(("security_groups", sg_format_list))
-                        .add_attribute(("subnet_id", template.subnet_id))
+                        .add_attribute(("subnet_id", format!("data.aws_subnet.{}.id",template.subnet_id)))
                         .build(),
                 )
                 .add_block(

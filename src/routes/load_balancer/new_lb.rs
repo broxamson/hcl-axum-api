@@ -8,8 +8,20 @@ use crate::routes::load_balancer::LoadBalancer;
 
 
 pub async fn new_load_balancer(lb_template: LoadBalancer, local_path: &Path) -> Result<(), Error> {
+    //formats the string to add TF data
+    let sg_format_list: Vec<String> = lb_template
+        .security_groups
+        .iter()
+        .map(|security_group| format!("data.security_group.{}.id", security_group))
+        .collect();
 
+    let subnet_format_list: Vec<String> = lb_template
+        .security_groups
+        .iter()
+        .map(|subnet_id| format!("data.aws_subnet.{}.id", subnet_id))
+        .collect();
 
+    //builds block
     let body = Body::builder()
         .add_block(
             Block::builder("resource")
@@ -22,8 +34,8 @@ pub async fn new_load_balancer(lb_template: LoadBalancer, local_path: &Path) -> 
                 .add_attribute(("load_balancer_type", lb_template.lb_type.to_string()))
                 .add_attribute(("name", lb_template.name.to_string()))
                 .add_attribute(("preserve_host_header", false))
-                .add_attribute(("security_groups", lb_template.security_groups))
-                .add_attribute(("subnets", lb_template.subnet_id))
+                .add_attribute(("security_groups", sg_format_list))
+                .add_attribute(("subnets", subnet_format_list))
                 .add_attribute(("tags", "".to_string()))
                 .add_attribute(("tags_all", "".to_string()))
                 .build(),
@@ -36,7 +48,7 @@ pub async fn new_load_balancer(lb_template: LoadBalancer, local_path: &Path) -> 
                 .add_attribute(("port", lb_template.port.to_string()))
                 .add_attribute(("protocol", lb_template.protocol.to_string()))
                 .add_attribute(("target_type", lb_template.target_type.to_string()))
-                .add_attribute(("vpc_id", lb_template.vpc_id.to_string()))
+                .add_attribute(("vpc_id", format!("data.aws_vpc.{}.id", lb_template.vpc_id)))
                 .add_block(
                     Block::builder("health_check")
                         .add_attribute(("enabled", true))
