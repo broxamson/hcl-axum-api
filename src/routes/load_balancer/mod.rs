@@ -28,8 +28,6 @@ pub struct LoadBalancer {
     vpc_id: String,
 
 
-
-
 }
 
 
