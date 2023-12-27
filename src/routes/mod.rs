@@ -11,6 +11,7 @@ mod s3;
 mod launch_templates;
 mod load_balancer;
 mod acm;
+mod asg;
 
 pub async fn create_routes() -> Router {
     Router::new()
