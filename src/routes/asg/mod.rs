@@ -50,6 +50,8 @@ pub struct ASGInput {
 pub async fn asg_api(
     Json(asg_input): Json<ASGInput>,
 ) -> Result<Json<String>, axum::http::StatusCode> {
+    let branch_name = asg_input.name.clone();
+
     let asg_input_json = ASGInput {
         count: asg_input.count,
         capacity_rebalance: asg_input.capacity_rebalance,
@@ -77,7 +79,7 @@ pub async fn asg_api(
     };
 
 
-    let branch_name = asg_input.name.to_string();
+
     dbg!(&branch_name);
     let pull_request = PullRequest {
         title: branch_name.to_string(),

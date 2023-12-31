@@ -21,7 +21,7 @@ pub async fn web() {
     let app = create_routes();
 
     // run it with hyper on localhost:3000
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+    axum::Server::bind(&"0.0.0.0:4000".parse().unwrap())
         .serve(app.await.into_make_service())
         .await
         .unwrap();
