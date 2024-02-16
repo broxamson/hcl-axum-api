@@ -148,7 +148,7 @@ pub async fn push_to_repository(repo_path: &Path, branch_name: &str) -> Result<(
     let mut callbacks = RemoteCallbacks::new();
     callbacks.credentials(|_url, _username, _allowed| {
         // Provide your credentials here
-        Cred::userpass_plaintext("nvanamen", "ATBBpPMd3yzBChW3P8W3Mf8J5AsCADDF67AA")
+        Cred::userpass_plaintext("nvanamen", "")
     });
 
     // Set up push options with remote callbacks
